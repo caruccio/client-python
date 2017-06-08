@@ -15,13 +15,13 @@
 import sys
 
 # Kubernetes branch to get the OpenAPI spec from.
-KUBERNETES_BRANCH = "release-1.6"
+KUBERNETES_BRANCH = "release-1.5"
 
 # client version for packaging and releasing.
-CLIENT_VERSION = "2.0.0-snapshot"
+CLIENT_VERSION = "2.0.0"
 
 # Name of the release package
-PACKAGE_NAME = "kubernetes"
+PACKAGE_NAME = "openshift"
 
 # Stage of development, mainly used in setup.py's classifiers.
 DEVELOPMENT_STATUS = "3 - Alpha"

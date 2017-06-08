@@ -29,8 +29,9 @@ WATCH_OP_SUFFIX = "List"
 LIST_OP_PREFIX = "list"
 WATCH_QUERY_PARAM_NAME = "watch"
 
-SPEC_URL = 'https://raw.githubusercontent.com/kubernetes/kubernetes/' \
-           '%s/api/openapi-spec/swagger.json' % KUBERNETES_BRANCH
+SPEC_URL = 'https://raw.githubusercontent.com/openshift/origin/' \
+           '%s/api/swagger-spec/openshift-openapi-spec.json'  % KUBERNETES_BRANCH
+
 
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), 'swagger.json')
 
@@ -99,7 +100,7 @@ def remove_watch_operations(op, parent, operation_ids):
 
 def strip_tags_from_operation_id(operation, _):
     operation_id = operation['operationId']
-    for t in operation['tags']:
+    for t in operation.get('tags', []):
         operation_id = operation_id.replace(_to_camel_case(t), '')
     operation['operationId'] = operation_id
 
@@ -113,8 +114,29 @@ def add_thirdparty_resource_paths(spec):
     return spec
 
 
+def ensure_security_definitions(spec):
+    if 'securityDefinitions' in spec:
+        return spec
+
+    spec['securityDefinitions'] = {
+        'BearerToken': {
+            'description': "Bearer Token authentication",
+            'type': "apiKey",
+            'name': "authorization",
+            'in': "header"
+        }
+    }
+    spec['security'] = [
+        {
+            'BearerToken': [ ]
+        }
+    ]
+    return spec
+
+
 def process_swagger(spec):
     spec = add_thirdparty_resource_paths(spec)
+    spec = ensure_security_definitions(spec)
 
     apply_func_to_spec_operations(spec, strip_tags_from_operation_id)
 
