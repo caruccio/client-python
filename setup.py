@@ -20,6 +20,7 @@ CLIENT_VERSION = "2.0.0"
 PACKAGE_NAME = "openshift"
 DEVELOPMENT_STATUS = "3 - Alpha"
 
+DISTRO_NAME = PACKAGE_NAME
 # To install the library, run the following
 #
 # python setup.py install
@@ -44,9 +45,9 @@ setup(
     keywords=["Swagger", "OpenAPI", "Kubernetes"],
     install_requires=REQUIRES,
     tests_require=TESTS_REQUIRES,
-    packages=['kubernetes', 'kubernetes.client', 'kubernetes.config',
-              'kubernetes.watch', 'kubernetes.client.apis',
-              'kubernetes.client.models'],
+    packages=[DISTRO_NAME, '%s.client' % DISTRO_NAME, '%s.config' % DISTRO_NAME,
+              '%s.watch' % DISTRO_NAME, '%s.client.apis' % DISTRO_NAME,
+              '%s.client.models' % DISTRO_NAME],
     include_package_data=True,
     long_description="""\
     Python client for kubernetes http://kubernetes.io/

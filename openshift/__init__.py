@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import kubernetes.client
-import kubernetes.config
-import kubernetes.watch
+import openshift.client
+import openshift.config
+import openshift.watch

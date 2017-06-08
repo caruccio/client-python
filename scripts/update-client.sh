@@ -31,8 +31,10 @@ if which gsed > /dev/null 2>&1; then
   SED=gsed
 fi
 
+DISTRO_NAME=${DISTRO_NAME:-kubernetes}
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")
-CLIENT_ROOT="${SCRIPT_ROOT}/../kubernetes"
+CLIENT_ROOT="${SCRIPT_ROOT}/../${DISTRO_NAME}"
+[ -d ${CLIENT_ROOT} ] || mkdir -p ${CLIENT_ROOT}
 CLIENT_VERSION=$(python "${SCRIPT_ROOT}/constants.py" CLIENT_VERSION)
 PACKAGE_NAME=$(python "${SCRIPT_ROOT}/constants.py" PACKAGE_NAME)
 DEVELOPMENT_STATUS=$(python "${SCRIPT_ROOT}/constants.py" DEVELOPMENT_STATUS)
@@ -58,9 +60,9 @@ echo "--- Generating client ..."
 mvn -f "${SCRIPT_ROOT}/pom.xml" clean generate-sources -Dgenerator.spec.path="${SCRIPT_ROOT}/swagger.json" -Dgenerator.output.path="${CLIENT_ROOT}" -Dgenerator.package.name=client -D=generator.client.version=${CLIENT_VERSION}
 
 echo "--- Patching generated code..."
-find "${CLIENT_ROOT}/test" -type f -name \*.py -exec $SED -i 's/\bclient/kubernetes.client/g' {} +
-find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec $SED -i 's/\bclient/kubernetes.client/g' {} +
-find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec $SED -i 's/kubernetes.client-python/client-python/g' {} +
+find "${CLIENT_ROOT}/test" -type f -name \*.py -exec $SED -i "s/\bclient/${DISTRO_NAME}.client/g" {} +
+find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec $SED -i "s/\bclient/${DISTRO_NAME}.client/g" {} +
+find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec $SED -i "s/${DISTRO_NAME}.client-python/client-python/g" {} +
 # rm "${CLIENT_ROOT}/LICENSE"
 echo "--- updating version information..."
 $SED -i'' "s/^CLIENT_VERSION = .*/CLIENT_VERSION = \\\"${CLIENT_VERSION}\\\"/" "${SCRIPT_ROOT}/../setup.py"
