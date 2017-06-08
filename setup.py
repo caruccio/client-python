@@ -16,8 +16,8 @@ from setuptools import find_packages, setup
 
 # Do not edit these constants. They will be updated automatically
 # by scripts/update-client.sh.
-CLIENT_VERSION = "2.0.0-snapshot"
-PACKAGE_NAME = "kubernetes"
+CLIENT_VERSION = "2.0.0"
+PACKAGE_NAME = "openshift"
 DEVELOPMENT_STATUS = "3 - Alpha"
 
 # To install the library, run the following
