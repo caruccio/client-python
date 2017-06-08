@@ -26,6 +26,11 @@ if ! which mvn > /dev/null 2>&1; then
   exit
 fi
 
+SED=sed
+if which gsed > /dev/null 2>&1; then
+  SED=gsed
+fi
+
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")
 CLIENT_ROOT="${SCRIPT_ROOT}/../kubernetes"
 CLIENT_VERSION=$(python "${SCRIPT_ROOT}/constants.py" CLIENT_VERSION)
@@ -53,16 +58,16 @@ echo "--- Generating client ..."
 mvn -f "${SCRIPT_ROOT}/pom.xml" clean generate-sources -Dgenerator.spec.path="${SCRIPT_ROOT}/swagger.json" -Dgenerator.output.path="${CLIENT_ROOT}" -Dgenerator.package.name=client -D=generator.client.version=${CLIENT_VERSION}
 
 echo "--- Patching generated code..."
-find "${CLIENT_ROOT}/test" -type f -name \*.py -exec sed -i 's/\bclient/kubernetes.client/g' {} +
-find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec sed -i 's/\bclient/kubernetes.client/g' {} +
-find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec sed -i 's/kubernetes.client-python/client-python/g' {} +
+find "${CLIENT_ROOT}/test" -type f -name \*.py -exec $SED -i 's/\bclient/kubernetes.client/g' {} +
+find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec $SED -i 's/\bclient/kubernetes.client/g' {} +
+find "${CLIENT_ROOT}" -path "${CLIENT_ROOT}/base" -prune -o -type f -a -name \*.md -exec $SED -i 's/kubernetes.client-python/client-python/g' {} +
 # rm "${CLIENT_ROOT}/LICENSE"
 echo "--- updating version information..."
-sed -i'' "s/^CLIENT_VERSION = .*/CLIENT_VERSION = \\\"${CLIENT_VERSION}\\\"/" "${SCRIPT_ROOT}/../setup.py"
-sed -i'' "s/^PACKAGE_NAME = .*/PACKAGE_NAME = \\\"${PACKAGE_NAME}\\\"/" "${SCRIPT_ROOT}/../setup.py"
-sed -i'' "s,^DEVELOPMENT_STATUS = .*,DEVELOPMENT_STATUS = \\\"${DEVELOPMENT_STATUS}\\\"," "${SCRIPT_ROOT}/../setup.py"
-sed -i'' "/^configuration = Configuration()$/d" "${CLIENT_ROOT}/client/__init__.py"
-sed -i'' "/^from .configuration import Configuration$/d" "${CLIENT_ROOT}/client/__init__.py"
-sed -i '${/^$/d;}' "${CLIENT_ROOT}/client/__init__.py"
+$SED -i'' "s/^CLIENT_VERSION = .*/CLIENT_VERSION = \\\"${CLIENT_VERSION}\\\"/" "${SCRIPT_ROOT}/../setup.py"
+$SED -i'' "s/^PACKAGE_NAME = .*/PACKAGE_NAME = \\\"${PACKAGE_NAME}\\\"/" "${SCRIPT_ROOT}/../setup.py"
+$SED -i'' "s,^DEVELOPMENT_STATUS = .*,DEVELOPMENT_STATUS = \\\"${DEVELOPMENT_STATUS}\\\"," "${SCRIPT_ROOT}/../setup.py"
+$SED -i'' "/^configuration = Configuration()$/d" "${CLIENT_ROOT}/client/__init__.py"
+$SED -i'' "/^from .configuration import Configuration$/d" "${CLIENT_ROOT}/client/__init__.py"
+$SED -i '${/^$/d;}' "${CLIENT_ROOT}/client/__init__.py"
 echo "from .configuration import Configuration, ConfigurationObject, configuration" >> "${CLIENT_ROOT}/client/__init__.py"
 echo "---Done."
